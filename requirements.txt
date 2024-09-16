@@ -23,3 +23,5 @@ timm
 torch>=1.13
 tqdm
 transformers==4.39.3
+fastapi
+uvicorn
