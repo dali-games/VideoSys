@@ -23,24 +23,41 @@ def generate_video(request: VideoRequest):
         engine = VideoSysEngine(config)
 
         # Generate the video based on the provided parameters
-        video = engine.generate(
+        result = engine.generate(
             prompt=request.prompt,
             guidance_scale=request.guidance_scale,
             num_inference_steps=request.num_inference_steps,
             num_frames=request.num_frames,
             seed=request.seed,
-        ).video[0]
+        )
+
+        # Check if the result is valid
+        if result is None or not hasattr(result, 'video') or not result.video:
+            raise HTTPException(status_code=500, detail="Video generation returned no data.")
+
+        video = result.video[0] if result.video else None
+
+        if video is None:
+            raise HTTPException(status_code=500, detail="No video data received.")
 
         # Save the video to a unique file
         output_dir = "./outputs"
         os.makedirs(output_dir, exist_ok=True)
+
         unique_filename = f"{uuid.uuid4()}.mp4"
         output_path = os.path.join(output_dir, unique_filename)
+
+        if output_path is None:
+            raise HTTPException(status_code=500, detail="Failed to construct the output path.")
+
         engine.save_video(video, output_path)
+
+        if not os.path.isfile(output_path):
+            raise HTTPException(status_code=500, detail="Failed to save the video file.")
 
         # Return the video file as a response
         return FileResponse(
-            output_path,
+            path=output_path,
             media_type="video/mp4",
             filename=unique_filename
         )
