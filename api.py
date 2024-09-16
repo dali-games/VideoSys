@@ -19,8 +19,11 @@ class VideoRequest(BaseModel):
 def generate_video(request: VideoRequest):
     try:
         # Initialize configuration and engine with the specified model name
-        config = CogVideoXConfig(request.model_name, enable_pab=True)
-        engine = VideoSysEngine(config)
+        try:
+            config = CogVideoXConfig(request.model_name, enable_pab=True)
+            engine = VideoSysEngine(config)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error initializing the model: {str(e)}")
 
         # Generate the video based on the provided parameters
         result = engine.generate(
