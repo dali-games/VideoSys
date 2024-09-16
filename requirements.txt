@@ -2,7 +2,7 @@ bs4
 click
 colossalai
 contexttimer
-diffusers==0.30.0
+diffusers
 einops
 fabric
 ftfy
