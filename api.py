@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 import os
 import uuid
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 class VideoRequest(BaseModel):
     model_name: str = "THUDM/CogVideoX-5b"  # Default model name
